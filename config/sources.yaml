@@ -1,0 +1,49 @@
+# News sources the Scout scans each morning to pick "today's AI tool".
+# All are public RSS/Atom feeds — no API keys required.
+# Add or remove freely; the Scout scores every item against the keywords below.
+
+feeds:
+  - name: TechCrunch AI
+    url: https://techcrunch.com/category/artificial-intelligence/feed/
+  - name: The Verge AI
+    url: https://www.theverge.com/rss/ai-artificial-intelligence/index.xml
+  - name: VentureBeat AI
+    url: https://venturebeat.com/category/ai/feed/
+  - name: Hugging Face Blog
+    url: https://huggingface.co/blog/feed.xml
+  - name: Product Hunt (today)
+    url: https://www.producthunt.com/feed
+  - name: Ben's Bites
+    url: https://bensbites.beehiiv.com/feed
+
+# Items are scored higher when the title/summary contains these terms.
+# Tuned toward "a tool a business can actually use", not pure research.
+boost_keywords:
+  - launch
+  - launches
+  - releases
+  - now available
+  - tool
+  - app
+  - agent
+  - automation
+  - workflow
+  - no-code
+  - free
+  - api
+  - integration
+  - assistant
+  - saves time
+  - productivity
+  - small business
+
+# Items are down-ranked when they look like pure funding/research/drama.
+penalty_keywords:
+  - raises
+  - funding
+  - lawsuit
+  - valuation
+  - benchmark
+  - paper
+  - research shows
+  - layoffs

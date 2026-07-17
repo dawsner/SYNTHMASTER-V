@@ -1,0 +1,15 @@
+# Core (Scout + Writer + config) — runs the key-less parts of the pipeline.
+# Scout parses RSS/Atom with the standard library (no feedparser), so the core
+# has only these two lightweight dependencies.
+PyYAML>=6.0
+requests>=2.31
+
+# Screen demo recording.
+playwright>=1.40
+
+# Optional: LLM-mode Writer (brand-accurate scripts). Set ANTHROPIC_API_KEY.
+anthropic>=0.40
+
+# Publishing (YouTube). Instagram/TikTok use plain HTTP via requests.
+google-api-python-client>=2.100
+google-auth-oauthlib>=1.2
