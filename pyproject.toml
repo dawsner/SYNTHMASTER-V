@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ityca"
+version = "0.1.0"
+description = "I think you can AI it — daily AI-explainer video pipeline"
+requires-python = ">=3.10"
+dependencies = [
+    "PyYAML>=6.0",
+    "requests>=2.31",
+]
+
+[project.optional-dependencies]
+demo = ["playwright>=1.40"]
+llm = ["anthropic>=0.40"]
+publish = ["google-api-python-client>=2.100", "google-auth-oauthlib>=1.2"]
+
+[project.scripts]
+ityca = "ityca.orchestrator:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
