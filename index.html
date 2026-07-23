@@ -242,7 +242,7 @@ body {
     flex: 1;
     display: flex;
     justify-content: center;
-    perspective: 1400px;
+    perspective: 1200px;
 }
 
 .product-photo-scroll {
@@ -250,18 +250,7 @@ body {
     height: auto;
     display: block;
     filter: drop-shadow(0 30px 45px rgba(0, 0, 0, 0.5));
-    opacity: 0;
-    transform: rotateY(-40deg) translateX(-60px) scale(0.85);
-    transition: opacity 1s ease-out, transform 1s cubic-bezier(0.22, 0.9, 0.25, 1);
-}
-
-.product-section[data-side="right"] .product-photo-scroll {
-    transform: rotateY(40deg) translateX(60px) scale(0.85);
-}
-
-.product-section.in-view .product-photo-scroll {
-    opacity: 1;
-    transform: rotateY(0deg) translateX(0) scale(1);
+    will-change: transform, opacity;
 }
 
 .product-info {
@@ -582,29 +571,35 @@ body {
 </svg>
 
 <script>
-// Entrance animation: rotate each product in from the side as its section scrolls into view
-const sections = document.querySelectorAll('.product-section');
-const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.classList.add('in-view');
-            const img = entry.target.querySelector('.product-photo-scroll');
-            setTimeout(() => { img.dataset.settled = 'true'; }, 1050);
-            observer.unobserve(entry.target);
-        }
-    });
-}, { threshold: 0.35 });
-sections.forEach(s => observer.observe(s));
+// Continuous 3D coverflow: every product image tilts, drifts and fades based on
+// where its section currently sits relative to the center of the viewport, so
+// the effect tracks the scroll directly instead of firing once and stopping.
+const photos = [...document.querySelectorAll('.product-photo-scroll')].map(img => ({
+    img,
+    rightSide: img.closest('.product-section').dataset.side === 'right'
+}));
 
-// Continuous gentle 3D tilt driven by scroll position, once a product has settled in
 function updateScrollTilt() {
-    document.querySelectorAll('.product-photo-scroll[data-settled="true"]').forEach(img => {
+    const viewportH = window.innerHeight;
+    const viewportCenter = viewportH / 2;
+
+    photos.forEach(({ img, rightSide }) => {
         const rect = img.getBoundingClientRect();
         const center = rect.top + rect.height / 2;
-        const viewportCenter = window.innerHeight / 2;
-        const progress = Math.max(-1, Math.min(1, (viewportCenter - center) / (window.innerHeight * 0.6)));
-        img.style.transform = `rotateY(${progress * 12}deg)`;
+        // -1 when the image is a full viewport below center, +1 when a full viewport above
+        const progress = Math.max(-1, Math.min(1, (viewportCenter - center) / viewportH));
+        const direction = rightSide ? -1 : 1;
+
+        const rotateY = progress * 40 * direction;
+        const translateX = progress * -70 * direction;
+        const translateY = progress * 40;
+        const scale = 1 - Math.abs(progress) * 0.18;
+        const opacity = 1 - Math.min(1, Math.abs(progress) * 1.1);
+
+        img.style.transform = `translate(${translateX}px, ${translateY}px) rotateY(${rotateY}deg) scale(${scale})`;
+        img.style.opacity = Math.max(0.05, opacity);
     });
+
     requestAnimationFrame(updateScrollTilt);
 }
 updateScrollTilt();
