@@ -1,0 +1,88 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String?
+  emailVerified DateTime?
+  image         String?
+  plan          String    @default("free")
+  stripeCustomerId     String?
+  stripeSubscriptionId String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts      Account[]
+  sessions      Session[]
+  businesses    Business[]
+  coachSessions CoachSession[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Business {
+  id          String   @id @default(cuid())
+  userId      String?
+  name        String
+  website     String?
+  industry    String
+  description String
+  location    String?
+  createdAt   DateTime @default(now())
+
+  user  User?  @relation(fields: [userId], references: [id])
+  scans Scan[]
+}
+
+model Scan {
+  id              String   @id @default(cuid())
+  businessId      String
+  createdAt       DateTime @default(now())
+  score           Int
+  details         String
+  recommendations String
+
+  business Business @relation(fields: [businessId], references: [id])
+}
+
+model CoachSession {
+  id        String   @id @default(cuid())
+  userId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  messages  String
+
+  user User @relation(fields: [userId], references: [id])
+}
